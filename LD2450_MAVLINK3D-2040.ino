@@ -3,18 +3,12 @@
 #include "mavlink/ardupilotmega/mavlink_msg_obstacle_distance_3d.h"
 #include "HLK_LD2450.h"
 
-UART Serial2(4, 5, 0, 0);
-
 
 HLK_LD2450 ld2450(&Serial1);
-
 
 unsigned long previousMillis = 0;
 const long interval = 100;
 
-int lidarAngle = 0;
-int messageAngle = 0;
-uint16_t distances[72];
 int target = 0;
 unsigned char data_buffer[4] = {0};
 int adjusted = 0;
@@ -27,57 +21,55 @@ char serial_buffer[15];
 
 int ledState = LOW;
 
-int pos = 1;          // servo position
-int dir = 1;          // servo moving direction: +1/-1
-int val;              // LiDAR measured value
-#define stepAng           1      // step angle
-#define numStep           64        // = 180/stepAng
 
 void setup()
 {
+  Serial1.setRX(1);
+  Serial1.setTX(0);
+  Serial1.setRX(4);
+  Serial1.setTX(5);
+  
   Serial2.begin(1500000); // FC
   Serial.begin(500000);
+  ld2450.begin();
 
-  memset(distances, UINT16_MAX, sizeof(distances)); // Filling the distances array with UINT16_MAX
 }
-int16_t Dist = 0;    // Distance to object in centimeters
+
+
 void loop()
 {
-  command_heartbeat()
+  command_heartbeat();
   ld2450.read();
-  command_Target1()
-  command_Target2()
-  command_Target3()
-  command_print() 
-
- 
-
+  command_Target1();
+  command_Target2();
+  command_Target3();
+  command_print() ;
  
 }
 
 
-// command_print();
-
 void command_heartbeat() {
-
 
   unsigned long currentMillis = millis();
   if (currentMillis - previousMillis >= interval) {
     previousMillis = currentMillis;
+    
+int type = MAV_TYPE_GROUND_ROVER;
+uint8_t autopilot_type = MAV_AUTOPILOT_INVALID;
+uint8_t system_mode = MAV_MODE_PREFLIGHT; ///< Booting up
+uint32_t custom_mode = 30;                 ///< Custom mode, can be defined by user/adopter
+uint8_t system_state = MAV_STATE_STANDBY; ///< System ready for flight
+
+uint8_t buf[MAVLINK_MAX_PACKET_LEN];
+mavlink_message_t msg;
 
     mavlink_msg_heartbeat_pack(1, 196, &msg, type, autopilot_type, system_mode, custom_mode, system_state);
-    len = mavlink_msg_to_send_buffer(buf, &msg);
+    uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
     Serial1.write(buf, len);
-
   }
 }
 
-
-
 void command_Target1() {
-
-
-
 
 int sysid = 1;                     //< The component sending the message.
 int compid = 196;
@@ -92,34 +84,18 @@ float min_distance = 0 ;         //m   Minimum distance the sensor can measure.
 float max_distance = 5;         //m   Maximum distance the sensor can measure.
 
 
-
-uint8_t autopilot_type = MAV_AUTOPILOT_INVALID;
-uint8_t system_mode = MAV_MODE_PREFLIGHT; ///< Booting up
-uint32_t custom_mode = 30;                 ///< Custom mode, can be defined by user/adopter
-uint8_t system_state = MAV_STATE_STANDBY; ///< System ready for flight
-
-
-
 // Initialize the required buffers
 mavlink_message_t msg;
 uint8_t buf[MAVLINK_MAX_PACKET_LEN];
 int type = MAV_TYPE_GROUND_ROVER;
-// Pack the message
 
+// Pack the message
 mavlink_msg_obstacle_distance_3d_pack(sysid, compid, &msg, time_boot_ms, sensor_type, frame, obstacle_id, x, y, z, min_distance, max_distance);
 uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
 Serial1.write(buf, len);
-
-
 }
 
-
-
-
 void command_Target2() {
-
-
-
 
 int sysid = 1;                     //< The component sending the message.
 int compid = 196;
@@ -133,37 +109,18 @@ float z = 0;                           //m   Z position of the obstacle.
 float min_distance = 0 ;         //m   Minimum distance the sensor can measure.
 float max_distance = 5;         //m   Maximum distance the sensor can measure.
 
-
-
-uint8_t autopilot_type = MAV_AUTOPILOT_INVALID;
-uint8_t system_mode = MAV_MODE_PREFLIGHT; ///< Booting up
-uint32_t custom_mode = 30;                 ///< Custom mode, can be defined by user/adopter
-uint8_t system_state = MAV_STATE_STANDBY; ///< System ready for flight
-
-
-
 // Initialize the required buffers
 mavlink_message_t msg;
 uint8_t buf[MAVLINK_MAX_PACKET_LEN];
-int type = MAV_TYPE_GROUND_ROVER;
-// Pack the message
 
+// Pack the message
 mavlink_msg_obstacle_distance_3d_pack(sysid, compid, &msg, time_boot_ms, sensor_type, frame, obstacle_id, x, y, z, min_distance, max_distance);
 uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
 Serial1.write(buf, len);
-
-
 }
 
-
-
-
-
 void command_Target3() {
-
-
-
-
+  
 int sysid = 1;                     //< The component sending the message.
 int compid = 196;
 uint32_t time_boot_ms = 0;         //    ms Timestamp (time since system boot).
@@ -177,27 +134,15 @@ float min_distance = 0 ;         //m   Minimum distance the sensor can measure.
 float max_distance = 5;         //m   Maximum distance the sensor can measure.
 
 
-
-uint8_t autopilot_type = MAV_AUTOPILOT_INVALID;
-uint8_t system_mode = MAV_MODE_PREFLIGHT; ///< Booting up
-uint32_t custom_mode = 30;                 ///< Custom mode, can be defined by user/adopter
-uint8_t system_state = MAV_STATE_STANDBY; ///< System ready for flight
-
-
-
 // Initialize the required buffers
 mavlink_message_t msg;
 uint8_t buf[MAVLINK_MAX_PACKET_LEN];
-int type = MAV_TYPE_GROUND_ROVER;
-// Pack the message
 
+// Pack the message
 mavlink_msg_obstacle_distance_3d_pack(sysid, compid, &msg, time_boot_ms, sensor_type, frame, obstacle_id, x, y, z, min_distance, max_distance);
 uint16_t len = mavlink_msg_to_send_buffer(buf, &msg);
 Serial1.write(buf, len);
-
-
 }
-
 
 
 
