@@ -5,12 +5,8 @@
 
 UART Serial2(4, 5, 0, 0);
 
-#define ld2450_rx 6
-#define ld2450_tx 7
 
 HLK_LD2450 ld2450(&Serial1);
-
-
 
 
 unsigned long previousMillis = 0;
