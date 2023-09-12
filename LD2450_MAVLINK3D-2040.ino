@@ -26,8 +26,8 @@ void setup()
 {
   Serial1.setRX(1);
   Serial1.setTX(0);
-  Serial1.setRX(4);
-  Serial1.setTX(5);
+  Serial2.setRX(4);
+  Serial2.setTX(5);
   
   Serial2.begin(1500000); // FC
   Serial.begin(500000);
